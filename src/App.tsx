@@ -9,6 +9,8 @@ type NavigationItem =
   | "Purchases"
   | "Reports";
 
+type Theme = "light" | "dark";
+
 type DatabaseStatus = {
   success: boolean;
   message: string;
@@ -47,6 +49,26 @@ function formatCurrency(value: number) {
 }
 
 function App() {
+  const [theme, setTheme] = useState<Theme>(() => {
+    try {
+      return localStorage.getItem("pharmasathi-theme") === "dark"
+        ? "dark"
+        : "light";
+    } catch {
+      return "light";
+    }
+  });
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+
+    try {
+      localStorage.setItem("pharmasathi-theme", theme);
+    } catch (error) {
+      console.warn("Could not save theme preference:", error);
+    }
+  }, [theme]);
+
   const [activePage, setActivePage] =
     useState<NavigationItem>("Dashboard");
 
@@ -383,6 +405,29 @@ function App() {
           </div>
 
           <div className="topbar-right">
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={() =>
+                setTheme((current) => (current === "dark" ? "light" : "dark"))
+              }
+              aria-label={
+                theme === "dark"
+                  ? "Switch to light mode"
+                  : "Switch to dark mode"
+              }
+              title={
+                theme === "dark"
+                  ? "Switch to light mode"
+                  : "Switch to dark mode"
+              }
+            >
+              <span className="theme-toggle-icon" aria-hidden="true">
+                {theme === "dark" ? "☀" : "☾"}
+              </span>
+              <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
+            </button>
+
             <span className="offline-badge">
               <span
                 className="connection-dot"
@@ -477,8 +522,8 @@ function App() {
                     <span className="stat-icon green">₨</span>
                     <span className="stat-caption">SALES</span>
                   </div>
-                  <p className="stat-value">₨ 0</p>
-                  <h4>Today's sales</h4>
+                  <p className="stat-value sales-unconfigured">Not configured</p>
+                  <h4>Sales tracking</h4>
                   <p className="stat-foot">Billing feature not connected</p>
                 </article>
 

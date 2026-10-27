@@ -1792,3 +1792,376 @@ button:disabled {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* =========================================
+   PharmaSathi Premium UI Enhancements
+   ========================================= */
+
+:root {
+  --app-background: #f4f7f6;
+  --app-surface: #ffffff;
+  --app-surface-soft: #f8fbf9;
+  --app-text: #19352f;
+  --app-muted: #82918c;
+  --app-border: #e5ece8;
+  --app-accent: #138567;
+  --app-accent-hover: #0e7057;
+  --app-accent-soft: #eaf6f0;
+  --app-danger: #c74b4b;
+  --app-shadow: 0 8px 28px rgb(22 53 43 / 5%);
+  color-scheme: light;
+}
+
+.app-shell {
+  color: var(--app-text);
+  background: var(--app-background);
+  transition: background-color 220ms ease, color 220ms ease;
+}
+
+.sidebar,
+.topbar,
+.panel,
+.stat-card,
+.inventory-summary-card,
+.date-chip,
+.offline-badge,
+.alert-group,
+.table-scroll,
+.inventory-search {
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.sidebar {
+  background: var(--app-surface);
+}
+
+.topbar {
+  background: color-mix(in srgb, var(--app-surface) 92%, transparent);
+}
+
+.brand h1,
+.welcome-row h2,
+.section-heading h3,
+.panel-heading h3,
+.placeholder-panel h3,
+.inventory-toolbar h3,
+.inventory-summary-card strong,
+.stat-value {
+  color: var(--app-text);
+}
+
+.subtitle,
+.section-heading p,
+.panel-heading p,
+.inventory-toolbar p,
+.inventory-summary-card p {
+  color: var(--app-muted);
+}
+
+.panel,
+.stat-card,
+.inventory-summary-card {
+  background: var(--app-surface);
+  border-color: var(--app-border);
+  box-shadow: var(--app-shadow);
+}
+
+.panel {
+  border-radius: 16px;
+}
+
+.stat-card {
+  border-radius: 16px;
+}
+
+.stat-card:hover,
+.inventory-summary-card:hover {
+  box-shadow: 0 16px 36px rgb(22 53 43 / 9%);
+}
+
+.primary-button {
+  min-height: 40px;
+  border-radius: 10px;
+  font-weight: 750;
+}
+
+.secondary-button {
+  min-height: 38px;
+  border-radius: 10px;
+}
+
+.inventory-search {
+  min-height: 47px;
+  border-color: var(--app-border);
+  background: var(--app-surface);
+}
+
+.inventory-search:focus-within {
+  border-color: #69b39a;
+  box-shadow: 0 0 0 4px rgb(19 133 103 / 9%);
+}
+
+.medicine-table th {
+  background: var(--app-surface-soft);
+}
+
+.medicine-table tbody tr:hover {
+  background: var(--app-surface-soft);
+}
+
+.medicine-form {
+  border-color: var(--app-border);
+  background: var(--app-surface-soft);
+}
+
+.form-grid input {
+  border-color: var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-text);
+}
+
+.date-chip {
+  background: var(--app-surface);
+  border-color: var(--app-border);
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 9px 12px;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  background: var(--app-surface);
+  color: var(--app-text);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-1px);
+  border-color: var(--app-accent);
+}
+
+.theme-toggle:active {
+  transform: translateY(0);
+}
+
+.theme-toggle-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.topbar-right {
+  gap: 12px;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --app-background: #101815;
+  --app-surface: #17211c;
+  --app-surface-soft: #1c2922;
+  --app-text: #e4eee8;
+  --app-muted: #9aada2;
+  --app-border: #2b3b32;
+  --app-accent: #54c49a;
+  --app-accent-hover: #78d8b0;
+  --app-accent-soft: #203b2e;
+  --app-danger: #ff8d87;
+  --app-shadow: 0 8px 28px rgb(0 0 0 / 12%);
+}
+
+[data-theme="dark"] .app-shell,
+[data-theme="dark"] body {
+  background: var(--app-background);
+  color: var(--app-text);
+}
+
+[data-theme="dark"] .sidebar,
+[data-theme="dark"] .topbar,
+[data-theme="dark"] .panel,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .inventory-summary-card,
+[data-theme="dark"] .date-chip,
+[data-theme="dark"] .offline-badge,
+[data-theme="dark"] .inventory-search,
+[data-theme="dark"] .table-scroll {
+  background: var(--app-surface);
+  border-color: var(--app-border);
+  color: var(--app-text);
+}
+
+[data-theme="dark"] .brand h1,
+[data-theme="dark"] .welcome-row h2,
+[data-theme="dark"] .section-heading h3,
+[data-theme="dark"] .panel-heading h3,
+[data-theme="dark"] .placeholder-panel h3,
+[data-theme="dark"] .inventory-toolbar h3,
+[data-theme="dark"] .inventory-summary-card strong,
+[data-theme="dark"] .stat-value,
+[data-theme="dark"] .stat-card h4,
+[data-theme="dark"] .sidebar-footer strong,
+[data-theme="dark"] .quick-action strong,
+[data-theme="dark"] .alert-item strong,
+[data-theme="dark"] .medicine-name,
+[data-theme="dark"] .form-heading h4 {
+  color: var(--app-text);
+}
+
+[data-theme="dark"] .brand p,
+[data-theme="dark"] .menu-label,
+[data-theme="dark"] .breadcrumb,
+[data-theme="dark"] .subtitle,
+[data-theme="dark"] .section-heading p,
+[data-theme="dark"] .panel-heading p,
+[data-theme="dark"] .inventory-toolbar p,
+[data-theme="dark"] .inventory-summary-card p,
+[data-theme="dark"] .sidebar-footer p,
+[data-theme="dark"] .stat-foot,
+[data-theme="dark"] .medicine-subtitle,
+[data-theme="dark"] .inventory-footnote,
+[data-theme="dark"] .field-help {
+  color: var(--app-muted);
+}
+
+[data-theme="dark"] .nav-item {
+  color: #a8b9af;
+}
+
+[data-theme="dark"] .nav-item:hover,
+[data-theme="dark"] .nav-item.active {
+  background: #203b2e;
+  color: #8be0b8;
+  border-color: #315440;
+}
+
+[data-theme="dark"] .nav-shortcut {
+  background: #203b2e;
+  border-color: #315440;
+  color: #8be0b8;
+}
+
+[data-theme="dark"] .notice {
+  background: #1b3025;
+  border-color: #2e4b39;
+}
+
+[data-theme="dark"] .notice strong,
+[data-theme="dark"] .notice p {
+  color: #c8e8d5;
+}
+
+[data-theme="dark"] .quick-action,
+[data-theme="dark"] .system-row,
+[data-theme="dark"] .alert-item {
+  border-color: var(--app-border);
+}
+
+[data-theme="dark"] .quick-action:hover,
+[data-theme="dark"] .alert-item:hover {
+  background: #203027;
+}
+
+[data-theme="dark"] .system-row span,
+[data-theme="dark"] .alert-item small {
+  color: var(--app-muted);
+}
+
+[data-theme="dark"] .system-note,
+[data-theme="dark"] .alert-group-heading,
+[data-theme="dark"] .medicine-table thead,
+[data-theme="dark"] .medicine-table th {
+  background: var(--app-surface-soft);
+  border-color: var(--app-border);
+  color: var(--app-muted);
+}
+
+[data-theme="dark"] .alert-group {
+  background: var(--app-surface);
+  border-color: var(--app-border);
+}
+
+[data-theme="dark"] .alert-group-heading h4,
+[data-theme="dark"] .alert-empty strong {
+  color: var(--app-text);
+}
+
+[data-theme="dark"] .medicine-table td {
+  color: #c2d1c8;
+  border-color: var(--app-border);
+}
+
+[data-theme="dark"] .medicine-table tbody tr:hover {
+  background: #1c2922;
+}
+
+[data-theme="dark"] .medicine-form {
+  background: var(--app-surface-soft);
+  border-color: var(--app-border);
+}
+
+[data-theme="dark"] .form-grid label {
+  color: #c4d4ca;
+}
+
+[data-theme="dark"] .form-grid input,
+[data-theme="dark"] .inventory-search input {
+  background: var(--app-surface);
+  color: var(--app-text);
+  border-color: var(--app-border);
+}
+
+[data-theme="dark"] .inventory-search input {
+  border: 0;
+}
+
+[data-theme="dark"] .form-grid input::placeholder,
+[data-theme="dark"] .inventory-search input::placeholder {
+  color: #83978a;
+}
+
+[data-theme="dark"] .secondary-button,
+[data-theme="dark"] .theme-toggle {
+  background: var(--app-surface-soft);
+  color: var(--app-text);
+  border-color: var(--app-border);
+}
+
+[data-theme="dark"] .secondary-button:hover,
+[data-theme="dark"] .theme-toggle:hover {
+  background: #26382d;
+  border-color: #47795d;
+}
+
+[data-theme="dark"] .date-chip,
+[data-theme="dark"] .offline-badge {
+  color: var(--app-text);
+}
+
+[data-theme="dark"] .page-footer {
+  border-color: var(--app-border);
+  color: var(--app-muted);
+}
+
+@media (max-width: 680px) {
+  .topbar-right {
+    gap: 7px;
+  }
+
+  .theme-toggle {
+    min-height: 34px;
+    padding: 7px 9px;
+    font-size: 11px;
+  }
+}

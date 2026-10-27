@@ -1,3 +1,4 @@
+
 # Dependencies
 node_modules/
 
@@ -10,6 +11,10 @@ release/
 .env
 .env.*
 !.env.example
+
+# Authentication cookies and local session files
+*-cookies.txt
+cookies.txt
 
 # Local databases and database sidecar files
 *.db
@@ -39,3 +44,6 @@ desktop.ini
 # Local backups
 *.backup
 *.before_stock_alerts.backup
+
+# Generated Prisma client
+/src/generated/prisma
