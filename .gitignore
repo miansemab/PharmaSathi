@@ -47,3 +47,8 @@ desktop.ini
 
 # Generated Prisma client
 /src/generated/prisma
+# Local AI coding assistant and development skills
+/.agents/
+/.claude/
+/.windsurf/
+/skills-lock.json
