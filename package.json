@@ -6,7 +6,7 @@
   "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite",
-    "electron:dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && electron .\"",
+    "electron:dev": "concurrently -k \"npm:api:dev\" \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && electron .\"",
     "api:dev": "tsx watch server/index.ts",
     "api:start": "tsx server/index.ts",
     "build": "tsc -b && vite build",
@@ -19,7 +19,9 @@
     "bcryptjs": "^3.0.3",
     "dotenv": "^18.0.9",
     "express": "^5.3.0",
+    "express-rate-limit": "^8.7.3",
     "express-session": "^1.19.0",
+    "nodemailer": "^10.3.1",
     "pg": "^8.23.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
@@ -29,17 +31,25 @@
     "@types/express": "^5.0.6",
     "@types/express-session": "^1.19.0",
     "@types/node": "^24.19.2",
+    "@types/nodemailer": "^8.0.2",
     "@types/pg": "^8.23.1",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "concurrently": "^9.2.1",
     "electron": "^45.0.0",
+    "electron-builder": "^26.18.0",
+    "esbuild": "^0.28.2",
     "oxlint": "^1.88.0",
     "prisma": "^7.10.1",
     "tsx": "^4.23.15",
     "typescript": "~6.0.3",
     "vite": "^8.3.4",
     "wait-on": "^8.0.4"
+  },
+  "allowScripts": {
+    "@prisma/engines@7.10.1": true,
+    "esbuild@0.28.2": true,
+    "prisma@7.10.1": true
   }
 }

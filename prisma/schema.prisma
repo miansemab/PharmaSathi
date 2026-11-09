@@ -15,27 +15,53 @@ enum MembershipRole {
   STAFF
 }
 
+enum SyncStatus {
+  PENDING
+  SYNCED
+  FAILED
+}
+
+enum EmailCodePurpose {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+}
+
 model Pharmacy {
-  id          String       @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
-  slug        String       @unique
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  slug        String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
   memberships Membership[]
+  devices     Device[]
+  medicines   Medicine[]
+  batches     MedicineBatch[]
+  suppliers   Supplier[]
+  customers   Customer[]
+  purchases   Purchase[]
+  sales       Sale[]
+  syncEvents  SyncEvent[]
+  auditLogs   AuditLog[]
 
   @@index([name])
 }
 
 model User {
-  id          String       @id @default(cuid())
-  name        String
-  email       String       @unique
-  passwordHash String
-  isActive    Boolean      @default(true)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  passwordHash  String
+  isActive      Boolean  @default(true)
+  emailVerified Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
   memberships Membership[]
   sessions    Session[]
+  emailCodes  EmailVerificationCode[]
+  auditLogs   AuditLog[]
+  catalogueReviews CatalogueReview[]
 }
 
 model Membership {
@@ -44,6 +70,7 @@ model Membership {
   pharmacyId String
   role       MembershipRole @default(STAFF)
   createdAt  DateTime       @default(now())
+
   user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   pharmacy   Pharmacy       @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
 
@@ -58,8 +85,324 @@ model Session {
   userId    String
   expiresAt DateTime
   createdAt DateTime @default(now())
+
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+model EmailVerificationCode {
+  id         String           @id @default(cuid())
+  userId     String
+  codeHash   String
+  purpose    EmailCodePurpose
+  expiresAt  DateTime
+  attempts   Int              @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime         @default(now())
+
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
+  @@index([expiresAt])
+}
+
+// Each installation has independent business data.
+model Device {
+  id           String   @id @default(cuid())
+  pharmacyId   String
+  deviceName   String
+  deviceCode   String   @unique
+  isActive     Boolean  @default(true)
+  lastSyncedAt DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  pharmacy     Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Restrict)
+
+  medicines   Medicine[]
+  batches     MedicineBatch[]
+  suppliers   Supplier[]
+  customers   Customer[]
+  purchases   Purchase[]
+  sales       Sale[]
+  syncEvents  SyncEvent[]
+  auditLogs   AuditLog[]
+
+  @@unique([id, pharmacyId])
+  @@index([pharmacyId])
+}
+
+model Medicine {
+  id           String   @id @default(cuid())
+  pharmacyId   String
+  deviceId     String
+  localId      String
+  name         String
+  genericName  String   @default("")
+  manufacturer String  @default("")
+  category     String   @default("")
+  barcode      String   @default("")
+  minimumStock Int      @default(10)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  pharmacy     Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Restrict)
+  device       Device   @relation(fields: [deviceId, pharmacyId], references: [id, pharmacyId], onDelete: Restrict)
+  batches      MedicineBatch[]
+  purchaseItems PurchaseItem[]
+  saleItems    SaleItem[]
+
+  @@unique([deviceId, localId])
+  @@unique([id, pharmacyId, deviceId])
+  @@index([pharmacyId, deviceId])
+  @@index([deviceId, name])
+  @@index([deviceId, barcode])
+}
+
+model MedicineBatch {
+  id            String   @id @default(cuid())
+  pharmacyId    String
+  deviceId      String
+  localId       String
+  medicineId    String
+  batchNumber   String
+  purchasePrice Float    @default(0)
+  salePrice     Float    @default(0)
+  quantity      Int      @default(0)
+  expiryDate    DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  pharmacy      Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Restrict)
+  device        Device   @relation(fields: [deviceId, pharmacyId], references: [id, pharmacyId], onDelete: Restrict)
+  medicine      Medicine @relation(fields: [medicineId, pharmacyId, deviceId], references: [id, pharmacyId, deviceId], onDelete: Restrict)
+  purchaseItems PurchaseItem[]
+  saleItems     SaleItem[]
+
+  @@unique([deviceId, localId])
+  @@unique([medicineId, batchNumber])
+  @@unique([id, pharmacyId, deviceId])
+  @@index([pharmacyId, deviceId])
+  @@index([deviceId, expiryDate])
+}
+
+model Supplier {
+  id         String   @id @default(cuid())
+  pharmacyId String
+  deviceId   String
+  localId    String
+  name       String
+  phone      String   @default("")
+  address    String   @default("")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Restrict)
+  device     Device   @relation(fields: [deviceId, pharmacyId], references: [id, pharmacyId], onDelete: Restrict)
+  purchases  Purchase[]
+
+  @@unique([deviceId, localId])
+  @@unique([id, pharmacyId, deviceId])
+  @@index([pharmacyId, deviceId])
+}
+
+model Customer {
+  id         String   @id @default(cuid())
+  pharmacyId String
+  deviceId   String
+  localId    String
+  name       String
+  phone      String   @default("")
+  address    String   @default("")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Restrict)
+  device     Device   @relation(fields: [deviceId, pharmacyId], references: [id, pharmacyId], onDelete: Restrict)
+  sales      Sale[]
+
+  @@unique([deviceId, localId])
+  @@unique([id, pharmacyId, deviceId])
+  @@index([pharmacyId, deviceId])
+}
+
+model Purchase {
+  id              String   @id @default(cuid())
+  pharmacyId      String
+  deviceId        String
+  localId         String
+  supplierId      String?
+  invoiceNumber   String
+  supplierName    String
+  supplierInvoice String   @default("")
+  total           Float
+  notes           String   @default("")
+  createdAt       DateTime @default(now())
+
+  pharmacy        Pharmacy  @relation(fields: [pharmacyId], references: [id], onDelete: Restrict)
+  device          Device    @relation(fields: [deviceId, pharmacyId], references: [id, pharmacyId], onDelete: Restrict)
+  supplier        Supplier? @relation(fields: [supplierId, pharmacyId, deviceId], references: [id, pharmacyId, deviceId], onDelete: Restrict)
+  items           PurchaseItem[]
+
+  @@unique([deviceId, localId])
+  @@unique([deviceId, invoiceNumber])
+  @@unique([id, pharmacyId, deviceId])
+  @@index([pharmacyId, deviceId])
+  @@index([deviceId, createdAt])
+}
+
+model PurchaseItem {
+  id             String   @id @default(cuid())
+  purchaseId     String
+  medicineId     String
+  batchId        String
+  pharmacyId     String
+  deviceId       String
+  medicineName   String
+  batchNumber    String
+  quantity       Int
+  unitCost       Float
+  unitSalePrice  Float
+  lineTotal      Float
+
+  purchase       Purchase      @relation(fields: [purchaseId, pharmacyId, deviceId], references: [id, pharmacyId, deviceId], onDelete: Restrict)
+  medicine       Medicine      @relation(fields: [medicineId, pharmacyId, deviceId], references: [id, pharmacyId, deviceId], onDelete: Restrict)
+  batch          MedicineBatch @relation(fields: [batchId, pharmacyId, deviceId], references: [id, pharmacyId, deviceId], onDelete: Restrict)
+
+  @@index([purchaseId])
+  @@index([deviceId, medicineId])
+}
+
+model Sale {
+  id            String   @id @default(cuid())
+  pharmacyId    String
+  deviceId      String
+  localId       String
+  customerId    String?
+  invoiceNumber String
+  subtotal      Float
+  total         Float
+  paymentMethod String
+  amountPaid    Float
+  changeDue     Float    @default(0)
+  createdAt     DateTime @default(now())
+
+  pharmacy      Pharmacy  @relation(fields: [pharmacyId], references: [id], onDelete: Restrict)
+  device        Device    @relation(fields: [deviceId, pharmacyId], references: [id, pharmacyId], onDelete: Restrict)
+  customer      Customer? @relation(fields: [customerId, pharmacyId, deviceId], references: [id, pharmacyId, deviceId], onDelete: Restrict)
+  items         SaleItem[]
+
+  @@unique([deviceId, localId])
+  @@unique([deviceId, invoiceNumber])
+  @@unique([id, pharmacyId, deviceId])
+  @@index([pharmacyId, deviceId])
+  @@index([deviceId, createdAt])
+}
+
+model SaleItem {
+  id           String   @id @default(cuid())
+  saleId       String
+  medicineId   String
+  batchId      String
+  pharmacyId   String
+  deviceId     String
+  medicineName String
+  batchNumber  String
+  quantity     Int
+  unitPrice    Float
+  unitCost     Float
+  lineTotal    Float
+
+  sale         Sale          @relation(fields: [saleId, pharmacyId, deviceId], references: [id, pharmacyId, deviceId], onDelete: Restrict)
+  medicine     Medicine      @relation(fields: [medicineId, pharmacyId, deviceId], references: [id, pharmacyId, deviceId], onDelete: Restrict)
+  batch        MedicineBatch @relation(fields: [batchId, pharmacyId, deviceId], references: [id, pharmacyId, deviceId], onDelete: Restrict)
+
+  @@index([saleId])
+  @@index([deviceId, medicineId])
+}
+
+model SyncEvent {
+  id           String     @id @default(cuid())
+  pharmacyId   String
+  deviceId     String
+  localEventId String
+  eventType    String
+  payload      Json
+  status       SyncStatus @default(PENDING)
+  error        String?
+  createdAt    DateTime   @default(now())
+  syncedAt     DateTime?
+
+  pharmacy     Pharmacy   @relation(fields: [pharmacyId], references: [id], onDelete: Restrict)
+  device       Device     @relation(fields: [deviceId, pharmacyId], references: [id, pharmacyId], onDelete: Restrict)
+
+  @@unique([deviceId, localEventId])
+  @@index([pharmacyId, deviceId])
+  @@index([deviceId, status])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  pharmacyId String
+  deviceId   String?
+  userId     String?
+  action     String
+  entityType String
+  entityId   String?
+  details    Json?
+  createdAt  DateTime @default(now())
+
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Restrict)
+  device     Device?  @relation(fields: [deviceId, pharmacyId], references: [id, pharmacyId], onDelete: Restrict)
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([pharmacyId, createdAt])
+  @@index([deviceId, createdAt])
+}
+enum CatalogueStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+model MasterMedicine {
+  id                 String          @id @default(cuid())
+  brandName          String
+  genericName        String          @default("")
+  strength           String          @default("")
+  dosageForm         String          @default("")
+  manufacturer       String          @default("")
+  category           String          @default("")
+  barcode            String          @default("")
+  registrationNumber String          @default("")
+  description        String          @default("")
+  status             CatalogueStatus @default(PENDING)
+  isActive           Boolean         @default(true)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  reviews CatalogueReview[]
+
+  @@index([brandName])
+  @@index([genericName])
+  @@index([manufacturer])
+  @@index([category])
+  @@index([status, isActive])
+  @@index([barcode])
+  @@unique([brandName, genericName, strength, dosageForm, manufacturer])
+}
+model CatalogueReview {
+  id         String         @id @default(cuid())
+  medicineId String
+  reviewerId String
+  decision   CatalogueStatus
+  note       String         @default("")
+  createdAt  DateTime       @default(now())
+
+  medicine MasterMedicine @relation(fields: [medicineId], references: [id], onDelete: Restrict)
+  reviewer User            @relation(fields: [reviewerId], references: [id], onDelete: Restrict)
+
+  @@index([medicineId, createdAt])
+  @@index([reviewerId, createdAt])
 }
